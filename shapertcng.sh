@@ -21,7 +21,7 @@ echo "		htb {" >> $output
 echo "			class ( rate $(( $bandout ))Mbps, ceil $(( $bandout ))Mbps ) {" >> $output
 i=1
 for ip in "${ips[@]}"
-do echo "				\$_$i = class ( rate $(( $banddevided ))kbps, ceil $(( $bandout ))Mbps ) { sfq; } ;" >> $output ; i=`expr $i + 1` ;done
+do echo "				\$_$i = class ( rate $(( $banddevided ))kbps, ceil $(( $bandout ))Mbps ) { pfifo; } ;" >> $output ; i=`expr $i + 1` ;done
 echo "				}" >> $output
 echo "			}" >> $output
 echo "		}" >> $output
@@ -44,7 +44,7 @@ echo "          htb {" >> $output
 echo "                  class ( rate $(( $bandin ))Mbps, ceil $(( $bandin ))Mbps ) {" >> $output
 i=1
 for ip in "${ips[@]}"
-do echo "                               \$_$i = class ( rate $(( $banddevided ))kbps, ceil $(( $bandin ))Mbps ) { sfq; } ;" >> $output ; i=`expr $i + 1` ;done
+do echo "                               \$_$i = class ( rate $(( $banddevided ))kbps, ceil $(( $bandin ))Mbps ) { pfifo; } ;" >> $output ; i=`expr $i + 1` ;done
 echo "                          }" >> $output
 echo "                  }" >> $output
 echo "          }" >> $output
