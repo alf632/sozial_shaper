@@ -8,7 +8,7 @@ bandin="50"
 
 ######################eth0#######################
 
-banddevided="$(( $(( $bandout * 100 )) / ${#ips[@]} ))"
+banddevided="$(( $(( $bandout * 100 )) / (${#ips[@]} - 1) ))"
 
 echo "#define INTERFACE $interface" > $output
 i=1
@@ -16,12 +16,14 @@ echo "dev $interface {" >> $output
 echo "	egress {" >> $output
 for ip in "${ips[@]}" 
 do echo "		class (<\$_$i>)	if ip_src == $ip ;" >> $output ; i=`expr $i + 1` ; done
+echo    "   class ( <$default> ) ;" >> $output
 #echo "		class ( 0 ) if 1;" >> $output
 echo "		htb {" >> $output
 echo "			class ( rate $(( $bandout ))Mbps, ceil $(( $bandout ))Mbps ) {" >> $output
 i=1
 for ip in "${ips[@]}"
 do echo "				\$_$i = class ( rate $(( $banddevided ))kbps, ceil $(( $bandout ))Mbps ) { pfifo; } ;" >> $output ; i=`expr $i + 1` ;done
+echo    "       $default = class ( rate $(( $banddevided ))kbps, ceil $(( $bandout ))Mbps ) { pfifo; } ;" >> $output
 echo "				}" >> $output
 echo "			}" >> $output
 echo "		}" >> $output
@@ -29,7 +31,7 @@ echo "}" >> $output
 
 ######################eth1#######################
 
-banddevided="$(( $(( $bandin * 100 )) / ${#ips[@]} ))"
+banddevided="$(( $(( $bandin * 100 )) / (${#ips[@]} - 1) ))"
 interface="eth1"
 
 
@@ -39,12 +41,15 @@ echo "dev $interface {" >> $output
 echo "  egress {" >> $output
 for ip in "${ips[@]}" 
 do echo "               class (<\$_$i>) if ip_dst == $ip ;" >> $output ; i=`expr $i + 1` ; done
+echo    "               class ( <\$default> ) ;" >> $output
 #echo "         class ( 0 ) if 1;" >> $output
 echo "          htb {" >> $output
 echo "                  class ( rate $(( $bandin ))Mbps, ceil $(( $bandin ))Mbps ) {" >> $output
 i=1
 for ip in "${ips[@]}"
 do echo "                               \$_$i = class ( rate $(( $banddevided ))kbps, ceil $(( $bandin ))Mbps ) { pfifo; } ;" >> $output ; i=`expr $i + 1` ;done
+
+echo    "                               \$default = class ( rate $(( $banddevided ))kbps, ceil $(( $bandout ))Mbps ) { pfifo; } ;" >> $output
 echo "                          }" >> $output
 echo "                  }" >> $output
 echo "          }" >> $output
