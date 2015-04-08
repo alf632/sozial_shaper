@@ -16,14 +16,14 @@ echo "dev $interface {" >> $output
 echo "	egress {" >> $output
 for ip in "${ips[@]}" 
 do echo "		class (<\$_$i>)	if ip_src == $ip ;" >> $output ; i=`expr $i + 1` ; done
-echo    "   class ( <$default> ) ;" >> $output
+echo    "   class ( <\$default> ) ;" >> $output
 #echo "		class ( 0 ) if 1;" >> $output
 echo "		htb {" >> $output
 echo "			class ( rate $(( $bandout ))Mbps, ceil $(( $bandout ))Mbps ) {" >> $output
 i=1
 for ip in "${ips[@]}"
 do echo "				\$_$i = class ( rate $(( $banddevided ))kbps, ceil $(( $bandout ))Mbps ) { pfifo; } ;" >> $output ; i=`expr $i + 1` ;done
-echo    "       $default = class ( rate $(( $banddevided ))kbps, ceil $(( $bandout ))Mbps ) { pfifo; } ;" >> $output
+echo    "       \$default = class ( rate $(( $banddevided ))kbps, ceil $(( $bandout ))Mbps ) { pfifo; } ;" >> $output
 echo "				}" >> $output
 echo "			}" >> $output
 echo "		}" >> $output
